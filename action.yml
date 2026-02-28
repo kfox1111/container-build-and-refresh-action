@@ -42,7 +42,7 @@ runs:
         set -e
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
           echo "Buiding container: $container"
-          pushd "${{ inputs.directory}}/$container/"
-          docker build -t "${{inputs.repo/$container}}".
+          pushd "${{ inputs.directory }}/$container/"
+          docker build -t "${{inputs.repo }}/$container}}".
           popd
         done
