@@ -44,5 +44,6 @@ runs:
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
           docker build -t "${{ inputs.repo }}/$container" .
+          docker push "${{ inputs.repo }}/$container"
           popd
         done
