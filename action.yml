@@ -31,6 +31,8 @@ runs:
         echo "containers=[$DIRS]" >> $GITHUB_OUTPUT
 
     - name: Safe Iterate JSON array
+      id: build
+      shell: bash
       env:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
       run: |
