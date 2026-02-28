@@ -1,0 +1,39 @@
+name: 'Builds containers and pushes them only if changed'
+description: 'Returns a JSON array of containers within a target path'
+inputs:
+  directory:
+    description: 'The parent directory to scan'
+    required: false
+    default: 'containers'
+outputs:
+  containers:
+    description: 'A JSON array string of container names'
+    value: ${{ steps.get-containers.outputs.containers }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get directory list
+      id: get-containers
+      shell: bash
+      run: |
+        TARGET_DIR="${{ inputs.directory }}"
+        
+        # Check if directory exists to avoid silent failure
+        if [ ! -d "$TARGET_DIR" ]; then
+          echo "::error::Directory $TARGET_DIR does not exist."
+          exit 1
+        fi
+
+        # Find folders, format as JSON array ["dir1", "dir2"]
+        DIRS=$(find "$TARGET_DIR" -maxdepth 1 -mindepth 1 -type d -printf '"%f",' | sed 's/,$//')
+        
+        echo "containers=[$DIRS]" >> $GITHUB_OUTPUT
+
+    - name: Safe Iterate JSON array
+      env:
+        CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
+      run: |
+        echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
+          echo "Deploying container: $container"
+        done
