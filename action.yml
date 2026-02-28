@@ -5,6 +5,9 @@ inputs:
     description: 'The parent directory to scan'
     required: false
     default: 'containers'
+  repo:
+    description: 'The repository'
+    required: true
 outputs:
   containers:
     description: 'A JSON array string of container names'
@@ -36,6 +39,10 @@ runs:
       env:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
       run: |
+        set -e
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
-          echo "Deploying container: $container"
+          echo "Buiding container: $container"
+          pushd "${{ inputs.directory}}/$container/"
+          docker build -t "${{inputs.repo/$container}}".
+          popd
         done
