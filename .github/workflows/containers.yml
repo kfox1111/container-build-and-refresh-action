@@ -127,6 +127,9 @@ jobs:
         shell: bash
         run: |
           TARGET_DIR="${{ inputs.directory }}"
+          if [ -z "$TARGET_DIR"]; then
+            TARGET_DIR="containers"
+          fi
         
           # Check if directory exists to avoid silent failure
           if [ ! -d "$TARGET_DIR" ]; then
