@@ -38,6 +38,7 @@ runs:
       shell: bash
       env:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
+        COSIGN_YES: "true"
       run: |
         set -e
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
