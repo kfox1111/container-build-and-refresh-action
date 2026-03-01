@@ -173,6 +173,7 @@ jobs:
             CONTAINER_NAME="${{ inputs.repo }}/$container"
             echo "Buiding container: $container"
             crane ls "$CONTAINER_NAME" > list
+            cat list
             for entry in linux-arm64 linux-amd64; do
               grep "^$entry"'-\d{8}-\d{6}$' list | sed 's/^/  /'
             done
