@@ -40,21 +40,22 @@ runs:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
       run: |
         set -e
+        CONTAINER_NAME="${{ inputs.repo }}/$container"
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
-          docker build -t "${{ inputs.repo }}/$container" .
-          syft scan "${{ inputs.repo }}/$container" > sbom.json
+          docker build -t "$CONTAINER_NAME" .
+          syft scan "$CONTAINER_NAME" > sbom.json
           ls -lh sbom.json
 
           set +e
-          cosign download sbom <image-uri> --output-file existing-sbom.json
+          cosign download sbom "$CONTAINER_NAME" --output-file existing-sbom.json
           if [ -f existing-sbom.json ]; then
             echo Found existing container sbom
           fi
           set -e
 
-          docker push "${{ inputs.repo }}/$container"
-          cosign attach sbom --sbom sbom.json "${{ inputs.repo }}/$container"
+          docker push "$CONTAINER_NAME"
+          cosign attach sbom --sbom sbom.json "$CONTAINER_NAME"
           popd
         done
