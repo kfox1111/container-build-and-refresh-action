@@ -19,6 +19,9 @@ outputs:
   containers:
     description: 'A JSON array string of container names'
     value: ${{ steps.get-containers.outputs.containers }}
+  updated:
+    description: 'A JSON array string of container names that were updated'
+    value: ${{ steps.build.outputs.updated }}
 
 runs:
   using: "composite"
@@ -51,6 +54,8 @@ runs:
         MAINTAG="latest-${{ inputs.os }}-${{ inputs.arch }}"
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
         FINALTAG="${{ inputs.os }}-${{ inputs.arch }}-$DATETAG"
+        FIRST=1
+        OUTPUT=""
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
           CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
@@ -84,8 +89,14 @@ runs:
               --predicate sbom.json \
               "$CONTAINER_NAME:$FINALTAG"
             docker push "$CONTAINER_NAME:$MAINTAG"
+            if [ $FIRST -ne 1 ]; then
+              OUTPUT="$OUTPUT,"
+            fi
+            OUTPUT='"'"$container"'"'
+            FIRST=0
           else
             echo No difference detected in "$CONTAINER_NAME:$FINALTAG"
           fi
           popd
+        echo "updated=[$OUTPUT]" >> $GITHUB_OUTPUT
         done
