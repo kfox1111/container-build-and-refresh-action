@@ -174,6 +174,7 @@ jobs:
             echo "Buiding container: $container"
             crane ls "$CONTAINER_NAME" > list
             for entry in linux-arm64 linux-amd64; do
-              grep "^$entry"'-[0-9]\{8\}-[0-9]\{6\}$' list | sed 's/^/  /'
+              NEWEST=$(grep "^$entry"'-[0-9]\{8\}-[0-9]\{6\}$' list | sort -t '-' -k3,3r -k4,4r tags.txt | head -n 1)
+              echo Found newest $NEWEST
             done
           done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
