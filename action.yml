@@ -49,7 +49,7 @@ runs:
           ls -lh sbom.json
 
           # Bash style truth
-          DIFFERENCE=1
+          DIFFERENCE=0
           set +e
           cosign verify-attestation \
             --certificate-oidc-issuer=https://github.com/login/oauth \
