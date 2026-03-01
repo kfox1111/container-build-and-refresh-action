@@ -47,5 +47,6 @@ runs:
           syft scan "${{ inputs.repo }}/$container" > sbom.json
           ls -lh sbom.json
           docker push "${{ inputs.repo }}/$container"
+          cosign attach sbom --sbom sbom.json "${{ inputs.repo }}/$container"
           popd
         done
