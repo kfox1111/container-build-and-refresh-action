@@ -82,7 +82,7 @@ jobs:
         with:
           os: ${{ matrix.os }}
           arch: ${{ matrix.arch }}
-          repo: ${{ input.repo }}
+          repo: ${{ inputs.repo }}
 
       - name: Show updates
         run: |
