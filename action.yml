@@ -48,7 +48,7 @@ runs:
         COSIGN_YES: "true"
       run: |
         set -e
-        MAINTAG="latest-${{ image.os }}-${{ inputs.arch }}"
+        MAINTAG="latest-${{ inputs.os }}-${{ inputs.arch }}"
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
         FINALTAG="${{ inputs.os }}-${{ inputs.arch }}-$DATETAG"
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
