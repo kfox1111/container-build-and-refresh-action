@@ -46,7 +46,8 @@ jobs:
       - name: Download timestamp
         uses: actions/download-artifact@v4
         with:
-          pattern: timestamp.txt
+          name: timestamp.txt
+          merge-multiple: true
 
       - name: Log in to GHCR
         uses: docker/login-action@v3.7.0
@@ -107,7 +108,8 @@ jobs:
       - name: Download timestamp
         uses: actions/download-artifact@v4
         with:
-          pattern: timestamp.txt
+          name: timestamp.txt
+          merge-multiple: true
 
       - name: Download ALL results
         uses: actions/download-artifact@v4
