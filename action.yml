@@ -56,7 +56,7 @@ runs:
         FINALTAG="${{ inputs.os }}-${{ inputs.arch }}-$DATETAG"
         FIRST=1
         OUTPUT=""
-        echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
+        while read -r container; do
           CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
@@ -99,4 +99,4 @@ runs:
           fi
           popd
         echo "updated=[$OUTPUT]" >> $GITHUB_OUTPUT
-        done
+        done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
