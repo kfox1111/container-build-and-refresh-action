@@ -173,8 +173,17 @@ jobs:
             CONTAINER_NAME="${{ inputs.repo }}/$container"
             echo "Buiding container: $container"
             crane ls "$CONTAINER_NAME" > list
+            truncate inventory --size 0
+            truncate latest --size 0
             for entry in linux-arm64 linux-amd64; do
               NEWEST=$(grep "^$entry"'-[0-9]\{8\}-[0-9]\{6\}$' list | sort -t '-' -k3,3r -k4,4r | head -n 1)
               echo Found newest $NEWEST
+              STAMP=$(echo "$NEWEST" | awk -F- '{print $3 "-" $4}')
+              echo "$NEWEST" >> inventory
+              echo "$STAMP" >> latest
             done
+            echo inventory:
+            cat inventory
+            echo latest $(grep '^[0-9]\{8\}-[0-9]\{6\}$' latest | sort -t '-' -k1,1r -k2,2r | head -n 1)
+
           done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
