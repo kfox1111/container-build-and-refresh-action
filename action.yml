@@ -8,6 +8,13 @@ inputs:
   repo:
     description: 'The repository'
     required: true
+  arch:
+    description: 'CPU Architecture'
+    required: true
+  os:
+    description: 'Operating system'
+    required: true
+
 outputs:
   containers:
     description: 'A JSON array string of container names'
@@ -39,12 +46,11 @@ runs:
       env:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
         COSIGN_YES: "true"
-        OS: linux
-      run: |
+\      run: |
         set -e
         MAINTAG=latest
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
-        FINALTAG="$OS-$ARCH-$DATETAG"
+        FINALTAG="${{ inputs.os }}-${{ inputs.arch }}-$DATETAG"
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
           CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
