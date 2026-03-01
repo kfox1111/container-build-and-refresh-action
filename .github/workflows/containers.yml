@@ -172,5 +172,8 @@ jobs:
           while read -r container; do
             CONTAINER_NAME="${{ inputs.repo }}/$container"
             echo "Buiding container: $container"
-            crane ls "$CONTAINER_NAME"
+            crane ls "$CONTAINER_NAME" > list
+            for entry in linux-arm64 linux-amd64; do
+              grep '^$entry-\d{8}-\d{6}$' list | sed 's/^/  /'
+            done
           done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
