@@ -105,6 +105,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Crane
+        uses: imjasonh/setup-crane@v0.5
+
       - name: Download timestamp
         uses: actions/download-artifact@v4
         with:
@@ -117,6 +120,7 @@ jobs:
           path: all-results
           pattern: build-results-*
           merge-multiple: true
+
       - name: Show updates
         run: |
           echo Updated contaienrs:
@@ -157,4 +161,5 @@ jobs:
           while read -r container; do
             CONTAINER_NAME="${{ inputs.repo }}/$container"
             echo "Buiding container: $container"
+            crane ls "$CONTAINER_NAME"
           done
