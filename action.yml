@@ -82,7 +82,7 @@ runs:
           fi
           set -e
           if [ $DIFFERENCE -eq 0 ]; then
-            echo Difference detected. Pushing image "$CONTAINER_NAME:$FINALAG"
+            echo Difference detected. Pushing image "$CONTAINER_NAME:$FINALTAG"
             docker tag "$CONTAINER_NAME:$FINALTAG" "$CONTAINER_NAME:$MAINTAG"
             docker push "$CONTAINER_NAME:$FINALTAG"
             cosign attest --type spdxjson \
@@ -92,7 +92,7 @@ runs:
             if [ $FIRST -ne 1 ]; then
               OUTPUT="$OUTPUT,"
             fi
-            OUTPUT='"'"$container"'"'
+            OUTPUT="$OUTPUT"'$"'"$container"'"'
             FIRST=0
           else
             echo No difference detected in "$CONTAINER_NAME:$FINALTAG"
