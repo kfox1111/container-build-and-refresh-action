@@ -39,6 +39,7 @@ runs:
       env:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
       run: |
+        REMOTE_DIGEST=$(docker buildx imagetools inspect "$CONTAINER_NAME" --format '{{json .Manifest.Digest}}')
         set -e
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
           CONTAINER_NAME="${{ inputs.repo }}/$container"
@@ -51,7 +52,14 @@ runs:
           # Bash style truth
           DIFFERENCE=1
           set +e
-          cosign download sbom "$CONTAINER_NAME" --output-file existing-sbom.json
+          cosign verify-attestation \
+            --certificate-oidc-issuer=https://github.com/login/oauth \
+            --type https://spdx.dev/Document \
+            --certificate-identity=emailaddress@emailprovider.com \
+            $DIGEST | \
+            jq -r .payload | \
+            base64 -d | jq .predicate > existing-sbom.json
+          ls -l existing-sbom.json
           if [ -f existing-sbom.json ]; then
             echo Found existing container sbom
             sbomlyze existing-sbom.json sbom.json
@@ -61,7 +69,10 @@ runs:
           if [ $DIFFERENCE -eq 0 ]; then
             echo Difference detected. Pushing image "$CONTAINER_NAME"
             docker push "$CONTAINER_NAME"
-            cosign attach sbom --sbom sbom.json "$CONTAINER_NAME"
+            DIGEST=$(docker inspect "$CONTAINER_NAME" |jq -c 'first'| jq .RepoDigests | jq -c 'first' | tr -d '"')
+            cosign attest --type spdxjson \
+              --predicate example-image.spdx.json \
+              $DIGEST
           fi
           popd
         done
