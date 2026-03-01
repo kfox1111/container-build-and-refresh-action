@@ -162,4 +162,4 @@ jobs:
             CONTAINER_NAME="${{ inputs.repo }}/$container"
             echo "Buiding container: $container"
             crane ls "$CONTAINER_NAME"
-          done
+          done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
