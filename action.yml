@@ -45,7 +45,7 @@ runs:
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
           docker build -t "$CONTAINER_NAME" .
-          syft scan "$CONTAINER_NAME" > sbom.json
+          syft scan "$CONTAINER_NAME" -o spdx-json > sbom.json
           ls -lh sbom.json
 
           # Bash style truth
