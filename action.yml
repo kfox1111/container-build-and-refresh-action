@@ -56,7 +56,6 @@ runs:
             --certificate-identity "https://github.com/kfox1111/testing-repo/.github/workflows/main.yml@refs/heads/main" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --type https://spdx.dev/Document \
-            --certificate-identity=emailaddress@emailprovider.com \
             "$CONTAINER_NAME" | \
             jq -r .payload | \
             base64 -d | jq .predicate > existing-sbom.json
