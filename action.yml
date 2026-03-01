@@ -48,7 +48,7 @@ runs:
         COSIGN_YES: "true"
       run: |
         set -e
-        MAINTAG=latest
+        MAINTAG="latest-${{ image.os }}-${{ inputs.arch }}"
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
         FINALTAG="${{ inputs.os }}-${{ inputs.arch }}-$DATETAG"
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
@@ -82,7 +82,7 @@ runs:
             docker push "$CONTAINER_NAME:$FINALTAG"
             cosign attest --type spdxjson \
               --predicate sbom.json \
-              "$CONTAINER_NAME"
+              "$CONTAINER_NAME:$FINALTAG"
             docker push "$CONTAINER_NAME:$MAINTAG"
           else
             echo No difference detected in "$CONTAINER_NAME:$FINALTAG"
