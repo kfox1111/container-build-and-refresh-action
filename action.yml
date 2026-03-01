@@ -72,6 +72,8 @@ runs:
             cosign attest --type spdxjson \
               --predicate sbom.json \
               "$CONTAINER_NAME"
+          else
+            echo No difference detected in "$CONTAINER_NAME"
           fi
           popd
         done
