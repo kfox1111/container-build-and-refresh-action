@@ -1,8 +1,11 @@
 name: CI Build
 
 on:
-  workflow_call: {}
-    #inputs:
+  workflow_call:
+    inputs:
+      repo:
+        description: 'The repo to upload to'
+        required: true
 
 jobs:
   timestamp:
@@ -78,7 +81,7 @@ jobs:
         with:
           os: ${{ matrix.os }}
           arch: ${{ matrix.arch }}
-          repo: ghcr.io/kfox1111/testing-repo
+          repo: ${{ input.repo }}
 
       - name: Show updates
         run: |
