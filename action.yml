@@ -48,14 +48,20 @@ runs:
           syft scan "$CONTAINER_NAME" > sbom.json
           ls -lh sbom.json
 
+          # Bash style truth
+          DIFFERENCE=1
           set +e
           cosign download sbom "$CONTAINER_NAME" --output-file existing-sbom.json
           if [ -f existing-sbom.json ]; then
             echo Found existing container sbom
+            sbomlyze existing-sbom.json sbom.json
+            DIFFERENCE=$?
           fi
           set -e
-
-          docker push "$CONTAINER_NAME"
-          cosign attach sbom --sbom sbom.json "$CONTAINER_NAME"
+          if [ $DIFFERENCE -eq 0 ]; then
+            echo Difference detected. Pushing image "$CONTAINER_NAME"
+            docker push "$CONTAINER_NAME"
+            cosign attach sbom --sbom sbom.json "$CONTAINER_NAME"
+          fi
           popd
         done
