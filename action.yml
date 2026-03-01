@@ -46,7 +46,7 @@ runs:
       env:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
         COSIGN_YES: "true"
-\      run: |
+\     run: |
         set -e
         MAINTAG=latest
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
