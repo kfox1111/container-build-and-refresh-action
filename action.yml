@@ -59,7 +59,7 @@ runs:
             jq -r .payload | \
             base64 -d | jq .predicate > existing-sbom.json
           ls -l existing-sbom.json
-          if [ -f existing-sbom.json ]; then
+          if [ -s existing-sbom.json ]; then
             echo Found existing container sbom
             sbomlyze existing-sbom.json sbom.json
             DIFFERENCE=$?
