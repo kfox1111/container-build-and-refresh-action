@@ -166,7 +166,7 @@ jobs:
           CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
           COSIGN_YES: "true"
         run: |
-          set -e
+          set -ex
           MAINTAG="latest"
           DATETAG=$(cat timestamp.txt)
           while read -r container; do
