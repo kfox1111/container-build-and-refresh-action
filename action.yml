@@ -92,7 +92,7 @@ runs:
             if [ $FIRST -ne 1 ]; then
               OUTPUT="$OUTPUT,"
             fi
-            OUTPUT="$OUTPUT"'$"'"$container"'"'
+            OUTPUT="$OUTPUT"'"'"$container"'"'
             FIRST=0
           else
             echo No difference detected in "$CONTAINER_NAME:$FINALTAG"
