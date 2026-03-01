@@ -46,6 +46,14 @@ runs:
           docker build -t "${{ inputs.repo }}/$container" .
           syft scan "${{ inputs.repo }}/$container" > sbom.json
           ls -lh sbom.json
+
+          set +e
+          cosign download sbom <image-uri> --output-file existing-sbom.json
+          if [ -f existing-sbom.json ]; then
+            echo Found existing container sbom
+          fi
+          set -e
+
           docker push "${{ inputs.repo }}/$container"
           cosign attach sbom --sbom sbom.json "${{ inputs.repo }}/$container"
           popd
