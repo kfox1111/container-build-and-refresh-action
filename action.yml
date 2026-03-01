@@ -40,8 +40,8 @@ runs:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
       run: |
         set -e
-        CONTAINER_NAME="${{ inputs.repo }}/$container"
         echo $CONTAINER_JSON | jq -r '.[]' | while read -r container; do
+          CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
           docker build -t "$CONTAINER_NAME" .
