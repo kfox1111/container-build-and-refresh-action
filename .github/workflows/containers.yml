@@ -5,6 +5,7 @@ on:
     inputs:
       repo:
         description: 'The repo to upload to'
+        type: string
         required: true
 
 jobs:
