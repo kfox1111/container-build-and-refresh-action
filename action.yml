@@ -98,5 +98,6 @@ runs:
             echo No difference detected in "$CONTAINER_NAME:$FINALTAG"
           fi
           popd
-        echo "updated=[$OUTPUT]" >> $GITHUB_OUTPUT
         done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
+        echo "updated=[$OUTPUT]"
+        echo "updated=[$OUTPUT]" >> $GITHUB_OUTPUT
