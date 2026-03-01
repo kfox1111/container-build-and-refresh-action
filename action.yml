@@ -53,6 +53,9 @@ runs:
         set -e
         MAINTAG="latest-${{ inputs.os }}-${{ inputs.arch }}"
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
+        if [ -f timestamp.txt ]; then
+          DATETAG=$(cat timestamp.txt)
+        fi
         FINALTAG="${{ inputs.os }}-${{ inputs.arch }}-$DATETAG"
         FIRST=1
         OUTPUT=""
