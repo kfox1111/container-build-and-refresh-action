@@ -76,6 +76,7 @@ runs:
           #FIXME make the identity more configurable / automatic
           cosign verify-attestation \
             --certificate-identity "https://github.com/kfox1111/container-build-and-refresh-action/.github/workflows/containers.yml@refs/heads/main" \
+            --certificate-github-workflow-repository "${{ github.repository }}" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --type https://spdx.dev/Document \
             "$CONTAINER_NAME:$MAINTAG" | \
