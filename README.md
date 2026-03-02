@@ -26,13 +26,14 @@ jobs:
 
 Add a containers directory. Make a subdirectory for each container image you want, and add a Dockerfile to each.
 
-It will output images in ghcr.io/<yourorg>/<yourrepo>/<containername>
+It will output images in `ghcr.io/<yourorg>/<yourrepo>/<containername>`
 
 By default, it will produce a latest tag that will point at a multiarch index to the most recent builds.
 
 It will produce immutable multiarch images with a tag of the timestamp built on. It also produces individual immutable images tagged with the architecture.
 
 example tags:
+```
 latest
 latest-linux-arm64
 latest-linux-amd64
@@ -42,3 +43,4 @@ linux-arm64-20260302-012712
 linux-amd64-20260302-012712
 linux-arm64-20260302-011508
 linux-amd64-20260302-011508
+```
