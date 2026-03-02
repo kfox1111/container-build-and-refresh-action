@@ -191,8 +191,8 @@ jobs:
             while IFS= read -r TAG; do
               ARGS+=("-m" "$CONTAINER_NAME:$TAG")
             done < inventory
-            echo running: crane index append -t "$CONTAINER_NAME:$latest" "${ARGS[@]}"
-            crane index append -t "$CONTAINER_NAME:$latest" "${ARGS[@]}"
+            echo running: crane index append -t "$CONTAINER_NAME:$LATEST" "${ARGS[@]}"
+            crane index append -t "$CONTAINER_NAME:$LATEST" "${ARGS[@]}"
             crane index append -t "$CONTAINER_NAME:latest" "${ARGS[@]}"
 
           done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
