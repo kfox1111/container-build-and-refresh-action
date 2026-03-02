@@ -6,7 +6,8 @@ on:
       repo:
         description: The repo to upload to
         type: string
-        required: true
+        required: false
+        default: "ghcr.io/${{ github.repository }}"
 
 jobs:
   timestamp:
