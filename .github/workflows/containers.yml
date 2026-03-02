@@ -186,13 +186,12 @@ jobs:
             cat inventory
             LATEST=$(grep '^[0-9]\{8\}-[0-9]\{6\}$' latest | sort -t '-' -k1,1r -k2,2r | head -n 1)
             echo latest $LATEST
-            set +e
-            crane manifest "$CONTAINER_NAME:$LATEST" | jq -r '.manifests[] | select(.platform.os != "unknown" and .platform.architecture != "unknown") | .digest' | sort > committed-digests
-            set -e
-            if [ -s committed-digests ]; then
-              echo found existing image.
 
-            else
-              echo no existing tag. building...
-            fi
+            ARGS=()
+            while IFS= read -r TAG; do
+              ARGS+=("-m" "://$CONTAINER_NAME:TAG")
+            done < inventory
+            echo running: crane index append -t "://$CONTAINER_NAME:latest" "${ARGS[@]}"
+            crane index append -t "://$CONTAINER_NAME:latest" "${ARGS[@]}"
+
           done <<< "$(echo $CONTAINER_JSON | jq -r '.[]')"
