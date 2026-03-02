@@ -74,7 +74,6 @@ runs:
           # Bash style truth
           DIFFERENCE=0
           set +e
-          #FIXME make the identity more configurable / automatic
           cosign verify-attestation \
             --certificate-identity "https://github.com/kfox1111/container-build-and-refresh-action/.github/workflows/containers.yml@refs/heads/main" \
             --certificate-github-workflow-repository "${{ github.repository }}" \
