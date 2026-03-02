@@ -31,7 +31,7 @@ runs:
       shell: bash
       run: |
         TARGET_DIR="${{ inputs.directory }}"
-        if [ -z "$TARGET_DIR"]; then
+        if [ -z "$TARGET_DIR" ]; then
           TARGET_DIR="containers"
         fi
 
@@ -73,8 +73,9 @@ runs:
           # Bash style truth
           DIFFERENCE=0
           set +e
+          #FIXME make the identity more configurable / automatic
           cosign verify-attestation \
-            --certificate-identity "https://github.com/kfox1111/testing-repo/.github/workflows/main.yml@refs/heads/main" \
+            --certificate-identity "https://github.com/kfox1111/container-build-and-refresh-action/.github/workflows/containers.yml@refs/heads/main" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --type https://spdx.dev/Document \
             "$CONTAINER_NAME:$MAINTAG" | \
