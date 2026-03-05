@@ -8,10 +8,17 @@ on:
         type: string
         required: false
         default: "ghcr.io/${{ github.repository }}"
+      platforms:
+        description: "Space-separated list, e.g., 'linux/amd64 linux/arm64'"
+        type: string
+        required: false
+        default: "linux/amd64 linux/arm64"
 
 jobs:
   timestamp:
     runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Build timestamp
         run: |
@@ -24,9 +31,20 @@ jobs:
         with:
           name: timestamp.txt
           path: timestamp.txt
-
+      - id: set-matrix
+        run: |
+          SUPPORTED='[
+            {"os":"linux","arch":"amd64","runner_label":"ubuntu-24.04"},
+            {"os":"linux","arch":"arm64","runner_label":"ubuntu-24.04-arm"}
+          ]'
+          
+          INPUT_STR="${{ inputs.platforms }}"
+          RESULT=$(echo "$SUPPORTED" | jq -c "[.[] | select(. as \$item | \"\\(\$item.os)/\\(\$item.arch)\" | inside(\"$INPUT_STR\"))]")
+          
+          echo "matrix=$RESULT" >> $GITHUB_OUTPUT
   build:
-    needs: timestamp
+    needs:
+      - timestamp
 
     permissions:
       contents: read
@@ -35,13 +53,7 @@ jobs:
 
     strategy:
       matrix:
-        include:
-          - arch: amd64
-            runner_label: ubuntu-24.04
-            os: linux
-          - arch: arm64
-            runner_label: ubuntu-24.04-arm
-            os: linux
+        include: ${{ fromJSON(needs.timestamp.outputs.matrix) }}
             
     runs-on: ${{ matrix.runner_label }}
 
@@ -168,6 +180,7 @@ jobs:
           COSIGN_YES: "true"
         run: |
           set -e
+          PLATFORM_LIST=$(echo "${{ inputs.platforms }}" | sed 's/\//-/g')
           MAINTAG="latest"
           DATETAG=$(cat timestamp.txt)
           while read -r container; do
@@ -176,7 +189,7 @@ jobs:
             crane ls "$CONTAINER_NAME" > list
             truncate inventory --size 0
             truncate latest --size 0
-            for entry in linux-arm64 linux-amd64; do
+            for entry in $PLATFORM_LIST; do
               NEWEST=$(grep "^$entry"'-[0-9]\{8\}-[0-9]\{6\}$' list | sort -t '-' -k3,3r -k4,4r | head -n 1)
               echo Found newest $NEWEST
               STAMP=$(echo "$NEWEST" | awk -F- '{print $3 "-" $4}')
