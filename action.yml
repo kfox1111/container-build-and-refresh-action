@@ -93,7 +93,7 @@ runs:
             echo Difference detected. Pushing image "$CONTAINER_NAME:$FINALTAG"
             docker tag "$CONTAINER_NAME:$FINALTAG" "$CONTAINER_NAME:$MAINTAG"
             docker push "$CONTAINER_NAME:$FINALTAG"
-            cosign attest --type spdxjson \
+            cosign attest --timeout 600s --type spdxjson \
               --predicate sbom.json \
               "$CONTAINER_NAME:$FINALTAG"
             docker push "$CONTAINER_NAME:$MAINTAG"
