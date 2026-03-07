@@ -79,9 +79,10 @@ runs:
             --certificate-github-workflow-repository "${{ github.repository }}" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --type https://spdx.dev/Document \
-            "$CONTAINER_NAME:$MAINTAG" | \
-            jq -r .payload | \
-            base64 -d | jq .predicate > existing-sbom.json
+            "$CONTAINER_NAME:$MAINTAG" > raw_verification.json
+          REMOTE_SBOM_URI=$(cat raw_verification.json | jq -r '.payload | @base64d | fromjson | .predicate.uri')
+          echo "Verified Link Found: $REMOTE_SBOM_URI"
+          cosign download blob "$REMOTE_SBOM_URI" > existing-sbom.json
           ls -l existing-sbom.json
           if [ -s existing-sbom.json ]; then
             echo Found existing container sbom
@@ -94,8 +95,12 @@ runs:
             docker tag "$CONTAINER_NAME:$FINALTAG" "$CONTAINER_NAME:$MAINTAG"
             docker push "$CONTAINER_NAME:$FINALTAG"
             ls -l sbom.json
-            cosign attest --timeout 600s --type spdxjson \
-              --predicate sbom.json \
+            SBOM_DIGEST=$(cosign upload blob -f sbom.json "$CONTAINER_NAME:$FINALTAG.sbom")
+            echo '{"reference": "'""$CONTAINER_NAME@$SBOM_DIGEST"'", "type": "spdx-json"}' > link.json
+            cat link.json
+            cosign attest --timeout 600s --type https://spdx.dev/Document \
+              --predicate link.json \
+             --use-github-actions-oidc-auth \
               "$CONTAINER_NAME:$FINALTAG"
             docker push "$CONTAINER_NAME:$MAINTAG"
             if [ $FIRST -ne 1 ]; then
