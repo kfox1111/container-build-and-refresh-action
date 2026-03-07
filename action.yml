@@ -71,8 +71,7 @@ runs:
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
 
-          # Bash style truth
-          DIFFERENCE=0
+          DIFFERENCE=1
           set +e
           cosign verify-attestation \
             --certificate-identity "https://github.com/kfox1111/container-build-and-refresh-action/.github/workflows/containers.yml@refs/heads/main" \
@@ -88,11 +87,12 @@ runs:
           fi
           if [ -s existing-sbom.json ]; then
             echo Found existing container sbom
-            sbomlyze existing-sbom.json sbom.json
+            echo '{"max_added": 0, "max_removed": 0, "max_changed": 0, "deny_downgrades": true, "deny_duplicates": true}' > /tmp/policy.json'
+            sbomlyze existing-sbom.json sbom.json --policy /tmp/policy.json
             DIFFERENCE=$?
           fi
           set -e
-          if [ $DIFFERENCE -eq 0 ]; then
+          if [ $DIFFERENCE -ne 0 ]; then
             echo Difference detected. Pushing image "$CONTAINER_NAME:$FINALTAG"
             docker tag "$CONTAINER_NAME:$FINALTAG" "$CONTAINER_NAME:$MAINTAG"
             docker push "$CONTAINER_NAME:$FINALTAG"
