@@ -80,10 +80,12 @@ runs:
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --type https://spdx.dev/Document \
             "$CONTAINER_NAME:$MAINTAG" > raw_verification.json
-          REMOTE_SBOM_URI=$(cat raw_verification.json | jq -r '.payload | @base64d | fromjson | .predicate.uri')
-          echo "Verified Link Found: $REMOTE_SBOM_URI"
-          cosign download blob "$REMOTE_SBOM_URI" > existing-sbom.json
-          ls -l existing-sbom.json
+          if [ $! -eq 0 ]; then
+            REMOTE_SBOM_URI=$(cat raw_verification.json | jq -r '.payload | @base64d | fromjson | .predicate.uri')
+            echo "Verified Link Found: $REMOTE_SBOM_URI"
+            cosign download blob "$REMOTE_SBOM_URI" > existing-sbom.json
+            ls -l existing-sbom.json
+          fi
           if [ -s existing-sbom.json ]; then
             echo Found existing container sbom
             sbomlyze existing-sbom.json sbom.json
