@@ -15,6 +15,9 @@ inputs:
   os:
     description: 'Operating system'
     required: true
+  certificate-identity:
+    description: 'identity to verify in the certificate'
+    required: true
 
 outputs:
   containers:
@@ -74,7 +77,7 @@ runs:
           DIFFERENCE=1
           set +e
           cosign verify-attestation \
-            --certificate-identity "https://github.com/kfox1111/container-build-and-refresh-action/.github/workflows/containers.yml@refs/heads/main" \
+            --certificate-identity "${{ inputs.certificate-identity }}" \
             --certificate-github-workflow-repository "${{ github.repository }}" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --type https://spdx.dev/Document \
