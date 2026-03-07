@@ -103,7 +103,6 @@ runs:
             cat link.json
             cosign attest --timeout 600s --type https://spdx.dev/Document \
               --predicate link.json \
-             --use-github-actions-oidc-auth \
               "$CONTAINER_NAME:$FINALTAG"
             docker push "$CONTAINER_NAME:$MAINTAG"
             if [ $FIRST -ne 1 ]; then
