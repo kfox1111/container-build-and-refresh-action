@@ -87,7 +87,7 @@ runs:
           fi
           if [ -s existing-sbom.json ]; then
             echo Found existing container sbom
-            echo '{"max_added": 0, "max_removed": 0, "max_changed": 0, "deny_downgrades": true, "deny_duplicates": false}' > /tmp/policy.json
+            jq -n --arg ref "$CONTAINER_NAME"  '{"max_added": 0, "max_removed": 0, "max_changed": 0, "deny_downgrades": true, "deny_duplicates": false}, "ignore": [{"name": "$ref", "fields": ["version", "hashes"]}]' > /tmp/policy.json
             sbomlyze existing-sbom.json sbom.json --policy /tmp/policy.json
             DIFFERENCE=$?
           fi
