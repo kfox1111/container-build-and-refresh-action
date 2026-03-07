@@ -96,7 +96,8 @@ runs:
             docker push "$CONTAINER_NAME:$FINALTAG"
             ls -l sbom.json
             SBOM_DIGEST=$(cosign upload blob -f sbom.json "$CONTAINER_NAME:$FINALTAG.sbom")
-            echo '{"reference": "'""$CONTAINER_NAME@$SBOM_DIGEST"'", "type": "spdx-json"}' > link.json
+            jq -n --arg ref "$CONTAINER_NAME@$SBOM_DIGEST" \
+              '{reference: $ref, type: "spdx-json"}' > link.json
             cat link.json
             cosign attest --timeout 600s --type https://spdx.dev/Document \
               --predicate link.json \
