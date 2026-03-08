@@ -85,6 +85,7 @@ relative to containers dir.
 Example
 ```
 containerFile: ../../foo/Dockerfile
+```
 
 ### Context
 
@@ -94,3 +95,4 @@ relative to containers dir.
 Example
 ```
 context: ../../foo
+```
