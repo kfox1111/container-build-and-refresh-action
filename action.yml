@@ -64,6 +64,7 @@ runs:
           echo "$DIR_NAME $DIR_NAME"
         done | tsort | jq -R . | jq -sc . > /tmp/containers.txt
 
+        echo "containers=$(cat /tmp/containers.txt)"
         echo "containers=$(cat /tmp/containers.txt)" >> $GITHUB_OUTPUT
 
     - name: Safe Iterate JSON array
