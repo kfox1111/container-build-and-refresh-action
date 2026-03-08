@@ -45,11 +45,11 @@ runs:
           exit 1
         fi
 
-        DIRS=$(find "${{ inputs.directory }}" -maxdepth 1 -type d -not -path '*/.*' -not -path '.')
+        DIRS=$(find "$TARGET_DIR" -maxdepth 1 -mindepth 1 -type d -printf '%P\n')
 
         for D in $DIRS; do
-          DIR_NAME="${d#./}"
-          BUILD_FILE="$DIR_NAME/build.yaml"
+          DIR_NAME="${D#./}"
+          BUILD_FILE="$TARGET_DIR/$DIR_NAME/build.yaml"
 
           if [[ -f "$BUILD_FILE" ]]; then
             DEPS=$(yq eval '.dependencies // [] | .[]' "$BUILD_FILE")
