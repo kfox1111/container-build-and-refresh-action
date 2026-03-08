@@ -87,7 +87,11 @@ runs:
           CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
-          docker build -t "$CONTAINER_NAME:$FINALTAG" .
+          BUILD_ARGS_FLAGS=""
+          if [ -f "build.yaml" ]; then
+            BUILD_ARGS_FLAGS=$(yq '.buildArgs | select(. != null) |  with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' "$BUILD_FILE")
+          fi
+          docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" .
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
 

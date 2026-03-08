@@ -59,3 +59,21 @@ dependencies:
 - a
 - b
 ```
+
+### Build arguments
+
+You can add a dictionary of build arguments in the buildArgs section. They will all be added with --build-arg to the final build.
+
+Example `build.yaml:
+```
+buildArgs:
+  FOO: b
+```
+
+Dockerfile
+```
+FROM centos:centos9
+ARG FOO=a
+RUN echo $FOO
+```
+
