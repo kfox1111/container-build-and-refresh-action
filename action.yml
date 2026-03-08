@@ -45,7 +45,7 @@ runs:
           exit 1
         fi
 
-        DIRS=$(find . -maxdepth 1 -type d -not -path '*/.*' -not -path '.')
+        DIRS=$(find "${{ inputs.directory }}" -maxdepth 1 -type d -not -path '*/.*' -not -path '.')
 
         for D in $DIRS; do
           DIR_NAME="${d#./}"
