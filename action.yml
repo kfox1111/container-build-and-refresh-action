@@ -100,7 +100,7 @@ runs:
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
           CONTAINERFILE=$(yq '.containerFile // "Dockerfile"' build.yaml 2>/dev/null || echo "Dockerfile")
-          CONTEXT=$(yq '.context // "."' build.yaml 2>/dev/null || echo "Dockerfile")
+          CONTEXT=$(yq '.context // "."' build.yaml 2>/dev/null || echo ".")
           is_path_safe "$BUILDROOT" "$CONTAINERFILE"
           is_path_safe "$BUILDROOT" "$CONTEXT"
           BUILD_ARGS_FLAGS=""
