@@ -82,7 +82,7 @@ runs:
           if [[ "$CANONICAL_TEST" == "$CANONICAL_ROOT"* ]]; then
             return 0
           else
-            echo "Failed relative path security test $CANONICAL_TEST == $CANONICAL_ROOT*"
+            echo "Failed relative path security test $TEST_ROOT, $TEST_PATH, $CANONICAL_TEST == $CANONICAL_ROOT*"
             return 1
           fi
         }
