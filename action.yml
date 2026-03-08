@@ -107,6 +107,8 @@ runs:
           if [ -f "build.yaml" ]; then
             BUILD_ARGS_FLAGS=$(yq '.buildArgs | select(. != null) |  with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' "build.yaml")
           fi
+          echo "Containerfile: $CONTAINERFILE"
+          echo "Context: $CONTEXT"
           docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" "$CONTEXT"
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
