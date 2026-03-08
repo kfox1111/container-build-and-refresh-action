@@ -77,3 +77,11 @@ ARG FOO=a
 RUN echo $FOO
 ```
 
+### Container File
+
+You can specify an alternate location for the container file (AKA Dockerfile) with the `containerFile` setting. It will be processed
+relative to containers dir.
+
+Example
+```
+containerFile: ../../foo/Dockerfile

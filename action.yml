@@ -74,7 +74,19 @@ runs:
         CONTAINER_JSON: ${{ steps.get-containers.outputs.containers }}
         COSIGN_YES: "true"
       run: |
+        is_path_safe() {
+          local ROOT_DIR="$1"
+          local TEST_PATH="$2"
+          local CANONICAL_ROOT=$(readlink -f "$ROOT_DIR")
+          local CANONICAL_TEST=$(readlink -f "$TEST_PATH")
+          if [[ "$CANONICAL_TEST" == "$CANONICAL_ROOT"* ]]; then
+            return 0
+          else
+            return 1
+          fi
+        }
         set -e
+        BUILDROOT=$(pwd)
         MAINTAG="latest-${{ inputs.os }}-${{ inputs.arch }}"
         DATETAG=$(date -u +"%Y%m%d-%H%M%S")
         if [ -f timestamp.txt ]; then
@@ -87,11 +99,13 @@ runs:
           CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
+          CONTAINERFILE=$(yq '.containerFile // "Dockerfile"' config.yaml 2>/dev/null || echo "Dockerfile")
+          is_path_safe "$BUILDROOT" "$CONTAINERFILE"
           BUILD_ARGS_FLAGS=""
           if [ -f "build.yaml" ]; then
             BUILD_ARGS_FLAGS=$(yq '.buildArgs | select(. != null) |  with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' "$BUILD_FILE")
           fi
-          docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" .
+          docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" .
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
 
