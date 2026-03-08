@@ -133,7 +133,7 @@ runs:
             jq -n --arg ref "$CONTAINER_NAME"  '{"max_added": 0, "max_removed": 0, "max_changed": 0, "deny_downgrades": true, "deny_duplicates": false, "ignore": [{"name": $ref, "fields": ["version", "hashes"]}]}' > /tmp/policy.json
             cat /tmp/policy.json
             jq '(.packages[] | select(.name == "'"$CONTAINER_NAME"'")) |= del(.versionInfo, .checksums)' existing-sbom.json > existing.clean.json
-            jq '(.packages[] | select(.name == "'"$CONTAINERNAME"'")) |= del(.versionInfo, .checksums)' sbom.json > sbom.clean.json
+            jq '(.packages[] | select(.name == "'"$CONTAINER_NAME"'")) |= del(.versionInfo, .checksums)' sbom.json > sbom.clean.json
             sbomlyze existing.clean.json sbom.clean.json --policy /tmp/policy.json --ignore-root
             DIFFERENCE=$?
           fi
