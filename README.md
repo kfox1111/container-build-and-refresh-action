@@ -85,3 +85,12 @@ relative to containers dir.
 Example
 ```
 containerFile: ../../foo/Dockerfile
+
+### Context
+
+You can specify an alternate location for the container build context directory with the `context` setting. It will be processed
+relative to containers dir.
+
+Example
+```
+context: ../../foo

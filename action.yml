@@ -99,13 +99,15 @@ runs:
           CONTAINER_NAME="${{ inputs.repo }}/$container"
           echo "Buiding container: $container"
           pushd "${{ inputs.directory }}/$container/"
-          CONTAINERFILE=$(yq '.containerFile // "Dockerfile"' config.yaml 2>/dev/null || echo "Dockerfile")
+          CONTAINERFILE=$(yq '.containerFile // "Dockerfile"' build.yaml 2>/dev/null || echo "Dockerfile")
+          CONTEXT=$(yq '.context // "."' build.yaml 2>/dev/null || echo "Dockerfile")
           is_path_safe "$BUILDROOT" "$CONTAINERFILE"
+          is_path_safe "$BUILDROOT" "$CONTEXT"
           BUILD_ARGS_FLAGS=""
           if [ -f "build.yaml" ]; then
-            BUILD_ARGS_FLAGS=$(yq '.buildArgs | select(. != null) |  with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' "$BUILD_FILE")
+            BUILD_ARGS_FLAGS=$(yq '.buildArgs | select(. != null) |  with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' "build.yaml")
           fi
-          docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" .
+          docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" "$CONTEXT"
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
 
