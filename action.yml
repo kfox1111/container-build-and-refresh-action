@@ -42,10 +42,26 @@ runs:
           exit 1
         fi
 
-        # Find folders, format as JSON array ["dir1", "dir2"]
-        DIRS=$(find "$TARGET_DIR" -maxdepth 1 -mindepth 1 -type d -printf '"%f",' | sed 's/,$//')
-        
-        echo "containers=[$DIRS]" >> $GITHUB_OUTPUT
+        DIRS=$(find . -maxdepth 1 -type d -not -path '*/.*' -not -path '.')
+
+        for D in $DIRS; do
+          DIR_NAME="${d#./}"
+          BUILD_FILE="$DIR_NAME/build.yaml"
+
+          if [[ -f "$BUILD_FILE" ]]; then
+            DEPS=$(yq eval '.dependencies // [] | .[]' "$BUILD_FILE")
+
+            if [[ -n "$DEPS" ]]; then
+              for DEP in $deps; do
+                echo "$DIR_NAME $DEP"
+              done
+            fi
+          fi
+
+          echo "$DIR_NAME $DIR_NAME"
+        done | tsort | jq -R . | jq -sc . > /tmp/containers.txt
+
+        echo "containers=$(cat /tmp/containers.txt)" >> $GITHUB_OUTPUT
 
     - name: Safe Iterate JSON array
       id: build

@@ -44,3 +44,18 @@ linux-amd64-20260302-012712
 linux-arm64-20260302-011508
 linux-amd64-20260302-011508
 ```
+
+## Container Image Configuration
+
+Add a yaml file called `build.yaml` in the root directory of the container.
+
+### Dependencies
+
+You can make make one container depend on others in the dependencies section of the `build.yaml`
+
+Example that makes sure container `a` and `b` are built first:
+```
+dependencies:
+- a
+- b
+```
