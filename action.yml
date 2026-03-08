@@ -106,7 +106,7 @@ runs:
           is_path_safe "$BUILDROOT" "$CONTEXT"
           BUILD_ARGS_FLAGS=""
           if [ -f "build.yaml" ]; then
-            BUILD_ARGS_FLAGS=$(yq '.buildArgs | select(. != null) |  with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' "build.yaml")
+            BUILD_ARGS_FLAGS=$(yq '.buildArgs // {} | with_entries(.key + "=" + .value) | .[] | "--build-arg " + .' build.yaml)
           fi
           echo "Containerfile: $CONTAINERFILE"
           echo "Context: $CONTEXT"
