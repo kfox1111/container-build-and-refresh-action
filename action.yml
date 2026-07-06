@@ -56,7 +56,7 @@ runs:
 
             if [[ -n "$DEPS" ]]; then
               for DEP in $DEPS; do
-                echo "$DIR_NAME $DEP"
+                echo "$DEP $DIR_NAME"
               done
             fi
           fi
