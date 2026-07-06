@@ -105,12 +105,22 @@ runs:
           is_path_safe "$BUILDROOT" "$CONTAINERFILE"
           is_path_safe "$BUILDROOT" "$CONTEXT"
           BUILD_ARGS_FLAGS=""
+          DEP_ARGS_FLAGS=""
           if [ -f "build.yaml" ]; then
             BUILD_ARGS_FLAGS=$(yq '.buildArgs // {} | to_entries | .[] | "--build-arg " + .key + "=" + .value' build.yaml)
+            DEP_ENTRIES=$(yq '.dependencyArgs | to_entries | .[] | .key + ":" + .value' build.yaml 2>/dev/null || echo "")
+            for ENTRY in $DEP_ENTRIES; do
+              DEP_NAME="${ENTRY%%:*}"
+              ARG_NAME="${ENTRY#*:}"
+              DEP_IMAGE="${{ inputs.repo }}/$DEP_NAME:$MAINTAG"
+              echo "Resolving dependency: $ARG_NAME=$DEP_IMAGE"
+              docker pull "$DEP_IMAGE"
+              DEP_ARGS_FLAGS="$DEP_ARGS_FLAGS --build-arg $ARG_NAME=$DEP_IMAGE"
+            done
           fi
           echo "Containerfile: $CONTAINERFILE"
           echo "Context: $CONTEXT"
-          docker build $BUILD_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" "$CONTEXT"
+          docker build $BUILD_ARGS_FLAGS $DEP_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" "$CONTEXT"
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
 
