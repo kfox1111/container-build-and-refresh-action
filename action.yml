@@ -55,7 +55,7 @@ runs:
             DEPS=$(yq eval '.dependencies // [] | .[]' "$BUILD_FILE")
 
             if [[ -n "$DEPS" ]]; then
-              for DEP in $deps; do
+              for DEP in $DEPS; do
                 echo "$DIR_NAME $DEP"
               done
             fi
