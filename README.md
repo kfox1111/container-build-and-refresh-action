@@ -77,6 +77,20 @@ ARG FOO=a
 RUN echo $FOO
 ```
 
+### Revision
+
+Releases are normally cut only when the image's package set changes. To force a
+release for a change that does not alter packages (e.g. editing a label, env var,
+or entrypoint), set `revision` in `build.yaml` and change its value:
+
+```
+revision: "1"
+```
+
+The value is published as the `org.opencontainers.image.revision` label. Bump it
+(any string — a counter, date, or git sha) and the next run will push a new release
+even if the package inventory is unchanged.
+
 ### Container File
 
 You can specify an alternate location for the container file (AKA Dockerfile) with the `containerFile` setting. It will be processed

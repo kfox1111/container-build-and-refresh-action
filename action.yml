@@ -102,6 +102,7 @@ runs:
           pushd "${{ inputs.directory }}/$container/"
           CONTAINERFILE=$(yq '.containerFile // "Dockerfile"' build.yaml 2>/dev/null || echo "Dockerfile")
           CONTEXT=$(yq '.context // "."' build.yaml 2>/dev/null || echo ".")
+          REVISION=$(yq '.revision // ""' build.yaml 2>/dev/null || echo "")
           is_path_safe "$BUILDROOT" "$CONTAINERFILE"
           is_path_safe "$BUILDROOT" "$CONTEXT"
           BUILD_ARGS_FLAGS=""
@@ -120,7 +121,7 @@ runs:
           fi
           echo "Containerfile: $CONTAINERFILE"
           echo "Context: $CONTEXT"
-          docker build $BUILD_ARGS_FLAGS $DEP_ARGS_FLAGS -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" "$CONTEXT"
+          docker build $BUILD_ARGS_FLAGS $DEP_ARGS_FLAGS --label "org.opencontainers.image.revision=$REVISION" -t "$CONTAINER_NAME:$FINALTAG" -f "$CONTAINERFILE" "$CONTEXT"
           syft scan "$CONTAINER_NAME:$FINALTAG" -o spdx-json > sbom.json
           ls -lh sbom.json
 
@@ -148,6 +149,22 @@ runs:
             DIFFERENCE=$?
           fi
           set -e
+          if [ "$DIFFERENCE" -eq 0 ] && [ -n "$REVISION" ]; then
+            set +e
+            PUBLISHED_CONFIG=$(crane config "$CONTAINER_NAME:$MAINTAG" 2>/dev/null)
+            CRANE_RC=$?
+            set -e
+            if [ $CRANE_RC -eq 0 ]; then
+              # Label absent on older images -> "" -> differs from a set revision -> one forced push that bakes it
+              PUBLISHED_REVISION=$(echo "$PUBLISHED_CONFIG" | jq -r '.config.Labels["org.opencontainers.image.revision"] // ""')
+              if [ "$PUBLISHED_REVISION" != "$REVISION" ]; then
+                echo "Revision changed ('$PUBLISHED_REVISION' -> '$REVISION'). Forcing release of $CONTAINER_NAME:$FINALTAG"
+                DIFFERENCE=1
+              fi
+            else
+              echo "Could not read published image config for revision check; leaving release decision to the SBOM diff."
+            fi
+          fi
           if [ $DIFFERENCE -ne 0 ]; then
             echo Difference detected. Pushing image "$CONTAINER_NAME:$FINALTAG"
             docker tag "$CONTAINER_NAME:$FINALTAG" "$CONTAINER_NAME:$MAINTAG"
